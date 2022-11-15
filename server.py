@@ -4,13 +4,6 @@
 #Author Breanna Parker
 #11/7/22
 
-# Display the weather forecast in a readable format to the user. Do not display the weather data in Kelvin, since this is not readable to the average person.  You should allow the user to choose between Celsius and Fahrenheit and ideally also Kelvin.
-# Use comments within the application where appropriate in order to document what the program is doing. Comments should add value to the program and describe important elements of the program.
-# Validate whether the user entered valid data. If valid data isn’t presented notify the user. Your program should never crash with bad user input.
-# Use the Requests library in order to request data from the webservice.
-# Use try blocks when establishing connections to the webservice. You must print a message to the user indicating whether or not the connection was successful.
-# You must have proper coding convention including proper variable names (See PEP8).
-
 import json
 import requests
 from env import API_KEY
@@ -27,9 +20,10 @@ class openWeather():
     self.lon = "lon"
   
   def lat_lon(self,response):
-    url_lat_lon = f'http://api.openweathermap.org/data/2.5/weather?lat={response["lat"]}&lon={response["lon"]}&&appid={API_KEY}'
-    response2 = requests.get(url_lat_lon).json()
-    print(response2)
+    try:
+      url_lat_lon = f'http://api.openweathermap.org/data/2.5/weather?lat={response["lat"]}&lon={response["lon"]}&&appid={API_KEY}' #uses previous data from dictionary to input into api url
+      response2 = requests.get(url_lat_lon).json() #runs api and gets results
+      print(response2)
     # temps = response2["main"]
     # weather_dict = {}
     # temp_dict = {}
@@ -40,50 +34,55 @@ class openWeather():
     # temp_dict["Minimum Temperature"] = response2['main']["temp_min"]
     # temp_dict["Maximum Temperature"] = response2["main"]["temp_max"]
     # print(weather_dict, temp_dict)
-    temp_quest = input ("select one: c for celcius, f for fahrenheit, or k for kelvin?\n")
-    if temp_quest.lower() == "c":
-        self.k_to_c(response2)
-    elif temp_quest.lower() == 'f':
-        self.k_to_f(response2)
-    elif temp_quest.lower() == 'k':
-      print("For city:", response2["name"])
-      print("Current Temperature:", round(response2["main"]["temp"]), "K")
-      print("Feels Like:", round(response2["main"]["feels_like"]), "K")  
-      print("Minimum Temperature:", round(response2['main']["temp_min"]), "K") 
-      print("Maximum Temperature:", round(response2["main"]["temp_max"]), "K")
-      print("Humdity:", response2["main"]["humidity"], "%")
-      print("Sky:", response2["weather"][0]["main"])
+      temp_quest = input ("select one: c for celcius, f for fahrenheit, or k for kelvin?\n")
+      if temp_quest.lower() == "c":
+          self.k_to_c(response2)
+      elif temp_quest.lower() == 'f':
+          self.k_to_f(response2)
+      elif temp_quest.lower() == 'k':
+        print("For city:", response2["name"])
+        print("Current Temperature:", round(response2["main"]["temp"]), "K")
+        print("Feels Like:", round(response2["main"]["feels_like"]), "K")  
+        print("Minimum Temperature:", round(response2['main']["temp_min"]), "K") 
+        print("Maximum Temperature:", round(response2["main"]["temp_max"]), "K")
+        print("Humdity:", response2["main"]["humidity"], "%")
+        print("Pressure:", response2["main"]["pressure"], "pa")
+        print("Sky:", response2["weather"][0]["main"])
     # elif temp_quest.lower() == 'f':
     #     self.k_to_f(temp_dict)
     # elif temp_quest.lower() == 'k':
     #   for word in sorted(temps, key = temps.get):         
     #     print (word, temps[word])
+    except:
+        print("Error, city, state or zip code was incorrect") 
     else:
-        print("Error") 
+      print("Connection to lat/long API was succesful!")
     
   
   def weather_city(self,city_name,state):
     try:
-      url_city = f'http://api.openweathermap.org/geo/1.0/direct?q={city_name},{state}&limit=5&appid={API_KEY}'
-      res = requests.get(url_city).json()
-      response = {}
-      for r in res:
+      url_city = f'http://api.openweathermap.org/geo/1.0/direct?q={city_name},{state},{840}&limit=5&appid={API_KEY}'     #used f string to bring input values directly into url
+      res = requests.get(url_city).json()  #runs api code and results
+      response = {}      #makes sure code is in a dictionary for easy use in next code
+      for r in res:     #adds all data to dictionary
         response.update(r)
-      self.lat_lon(response)      
-    
-    except:
-      print("Error, try again!")
+      self.lat_lon(response)      #uses dictionary data in next function
+    except TypeError:
+      print("A Type Error occured!!")
+    else:
+      print("Connection to city/state API was succesful!")
   
   def weather_zip(self,zip_code):
     try:
-      url_zip = f'http://api.openweathermap.org/geo/1.0/zip?zip={zip_code}&appid={API_KEY}'
-      response = requests.get(url_zip).json()
-      self.lat_lon(response)
+      url_zip = f'http://api.openweathermap.org/geo/1.0/zip?zip={zip_code}&appid={API_KEY}'  #used f string to bring input values directly into url
+      response = requests.get(url_zip).json()  #run api code and results
+      self.lat_lon(response) #this set of code is already in a dictionary so can be pushed directly into the next function
     
     except:
       print("Error, pick a valid zip code!")
-    # else:
-    #   data = json.loads(source)
+    else:
+      print("Connection to zip code API was succesful!")
+
 
   def k_to_c(self,response2):
     print("For city:", response2["name"])
@@ -95,6 +94,7 @@ class openWeather():
     print("Feels Like:", feels_like, "C")  
     print("Minimum Temperature:", min_temp, "C") 
     print("Maximum Temperature:", max_temp, "C")
+    print("Pressure:", response2["main"]["pressure"], "pa")
     print("Humdity:", response2["main"]["humidity"], "%")
     print("Sky:", response2["weather"][0]["main"])
     
@@ -109,6 +109,7 @@ class openWeather():
     print("Feels Like:", feels_like, "F")  
     print("Minimum Temperature:", min_temp, "F") 
     print("Maximum Temperature:", max_temp, "F")
+    print("Pressure:", response2["main"]["pressure"], "pa")
     print("Humdity:", response2["main"]["humidity"], "%")
     print("Sky:", response2["weather"][0]["main"])
     
