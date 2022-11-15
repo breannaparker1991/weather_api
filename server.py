@@ -127,21 +127,21 @@ class openWeather():
 def main():
   user_name = input('What is your name?\n')       #weclomes user
   print("Hello",user_name)
-  user_name = openWeather()
+  user_name = openWeather()   #connects user to the openweather class method
   
-  while True:
-    line = input ("Choose zip or city or quit \n")
+  while True:       #creates a loop for user to continue using code until they choose to exit
+    line = input ("Choose zip or city or quit \n") #asks for user input
     
-    if line.lower() == "zip":
+    if line == "zip":      
       zip_code = input("What is the zip code?\n")
-      user_name.weather_zip(zip_code)
+      user_name.weather_zip(zip_code)     #passes zip code input through the zip code function
     
-    elif line.lower() == "city":
+    elif line.lower() == "city":    #makes sure user can enter upper or lower case and get same method
       city_name = input("what is the city name?\n")
       state = input("what is the state?\n")
-      user_name.weather_city(city_name,state)
+      user_name.weather_city(city_name,state)  #passes both city and state through to the API
 
-    elif line.lower() == "quit":
+    elif line.lower() == "quit":    #exits loop
       break
     
     else:
@@ -151,9 +151,5 @@ def main():
   
 if __name__ == '__main__':
   main()
-  
 
-# api key: a7b2d34580edfd791313a1c8cd7390cb
-
-    # print(weather_dict)
   
