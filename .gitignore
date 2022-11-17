@@ -7,6 +7,8 @@ env.py
 # C extensions
 *.so
 
+http://api.openweathermap.org/geo/1.0/direct?q=omaha,tx,us&limit=1&appid=a7b2d34580edfd791313a1c8cd7390cb
+
 # Distribution / packaging
 .Python
 build/

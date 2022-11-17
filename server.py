@@ -12,6 +12,7 @@ from urllib.request import urlopen
 
 BACKOFF_TIME = 30
 
+state_codes = {"Alabama":	"AL",	"Nebraska":	"NE", "Alaska":	"AK", "Nevada":	"NV", "Arizona":	"AZ", "New Hampshire":	"NH", "Arkansas":	"AR",	"New Jersey":	"NJ", "California":	"CA",	"New Mexico":	"NM", "Colorado":	"CO",	"New York":	"NY", "Connecticut":	"CT",	"North Carolina":	"NC", "Delaware":	"DE",	"North Dakota":	"ND", "District of Columbia":	"DC",	'Ohio':	'OH', 'Florida':	'FL',	'Oklahoma':	'OK', 'Georgia':	'GA', 	'Oregon':	'OR', 'Hawaii':	'HI',	'Pennsylvania':	'PA', 'Idaho':	'ID', 'Illinois':	'IL',	'Rhode Island':	'RI', 'Indiana':	'IN',	'South Carolina':	'SC', 'Iowa':	'IA',	'South Dakota':	'SD', 'Kansas':	'KS',	'Tennessee':	'TN', 'Kentucky':	'KY',	'Texas':	'TX', 'Louisiana':	'LA',	'Utah':	'UT', 'Maine':	'ME',	'Vermont':	'VT', 'Maryland':	'MD',	'Virginia':	'VA', 'Massachusetts':	'MA',	 'Michigan':	'MI',	'Washington':	'WA', 'Minnesota':	'MN',	'West Virginia':	'WV', 'Mississippi':	'MS',	'Wisconsin':	'WI', 'Missouri':	'MO',	'Wyoming':	'WY', 'Montana':	'MT'}
 
 class openWeather():
   def __init__(self):
@@ -47,7 +48,7 @@ class openWeather():
         print("Maximum Temperature:", round(response2["main"]["temp_max"]), "K")
         print("Humdity:", response2["main"]["humidity"], "%")
         print("Pressure:", response2["main"]["pressure"], "pa")
-        print("Sky:", response2["weather"][0]["main"])
+        print("Sky:", response2["weather"][0]["description"])
     # elif temp_quest.lower() == 'f':
     #     self.k_to_f(temp_dict)
     # elif temp_quest.lower() == 'k':
@@ -61,7 +62,7 @@ class openWeather():
   
   def weather_city(self,city_name,state):
     try:
-      url_city = f'http://api.openweathermap.org/geo/1.0/direct?q={city_name},{state},{840}&limit=5&appid={API_KEY}'     #used f string to bring input values directly into url
+      url_city = f'http://api.openweathermap.org/geo/1.0/direct?q={city_name},{state},us&limit=1&appid={API_KEY}'     #used f string to bring input values directly into url
       res = requests.get(url_city).json()  #runs api code and results
       response = {}      #makes sure code is in a dictionary for easy use in next code
       for r in res:     #adds all data to dictionary
@@ -74,7 +75,7 @@ class openWeather():
   
   def weather_zip(self,zip_code):
     try:
-      url_zip = f'http://api.openweathermap.org/geo/1.0/zip?zip={zip_code}&appid={API_KEY}'  #used f string to bring input values directly into url
+      url_zip = f'http://api.openweathermap.org/geo/1.0/zip?zip={zip_code},us&appid={API_KEY}'  #used f string to bring input values directly into url
       response = requests.get(url_zip).json()  #run api code and results
       self.lat_lon(response) #this set of code is already in a dictionary so can be pushed directly into the next function
     
@@ -96,7 +97,7 @@ class openWeather():
     print("Maximum Temperature:", max_temp, "C")
     print("Pressure:", response2["main"]["pressure"], "pa")
     print("Humdity:", response2["main"]["humidity"], "%")
-    print("Sky:", response2["weather"][0]["main"])
+    print("Sky:", response2["weather"][0]["description"])
     
     
   def k_to_f(self,response2):
@@ -111,7 +112,7 @@ class openWeather():
     print("Maximum Temperature:", max_temp, "F")
     print("Pressure:", response2["main"]["pressure"], "pa")
     print("Humdity:", response2["main"]["humidity"], "%")
-    print("Sky:", response2["weather"][0]["main"])
+    print("Sky:", response2["weather"][0]["description"])
     
     # for val in temp_dict.keys():
     #   converted = (val - 273.15) * 9 / 5 + 32
@@ -132,15 +133,25 @@ def main():
   
   while True:       #creates a loop for user to continue using code until they choose to exit
     line = input ("Choose zip or city or quit \n") #asks for user input
-    
     if line == "zip":      
       zip_code = input("What is the zip code?\n")
-      user_name.weather_zip(zip_code)     #passes zip code input through the zip code function
+      try:
+        check = int(zip_code)
+      except ValueError:
+        print("This is not a number. Please enter a valid number")
+      if len(zip_code) != 5: 
+        print("please enter a 5 character zip code")
+      else:
+        user_name.weather_zip(zip_code)     #passes zip code input through the zip code function with the API
     
     elif line.lower() == "city":    #makes sure user can enter upper or lower case and get same method
       city_name = input("what is the city name?\n")
-      state = input("what is the state?\n")
-      user_name.weather_city(city_name,state)  #passes both city and state through to the API
+      state = input("what is the two character state code?\n")
+      if len(state) != 2:
+        print("incorrect state code length")
+        for k, v in sorted(state_codes.items()):    #prints list of states in case user isn't sure what to use
+          print(k, v)
+      user_name.weather_city(city_name,state)  #passes both city and state through to the city function with the API
 
     elif line.lower() == "quit":    #exits loop
       break
@@ -153,4 +164,3 @@ def main():
 if __name__ == '__main__':
   main()
 
-  
